@@ -1,5 +1,15 @@
 require "spec_helper.rb"
 
+module Foo
+  module Target
+  end
+  module Bar
+    def self.works!
+      Targer.should == Target
+    end
+  end
+end
+
 module CloseEnoughSpec
 
   describe "nearest_method should find the nearest method to the typo" do
@@ -8,7 +18,7 @@ module CloseEnoughSpec
     end
 
     it "should return 'freeze' for 'frese'" do
-      @obj.send(:nearest_method, 'frese').should == "freeze"
+      CloseEnough.nearest(@obj.methods, 'frese').should == "freeze"
     end
 
   end
@@ -44,6 +54,18 @@ module CloseEnoughSpec
     end
   end
 
+  describe "should return the closest const" do
+  
+    it "should return FalseClass when FolseClass is referenced" do
+      FolseClass.should be FalseClass
+    end
+
+    it 'should works inside a module' do
+      Foo::Bar.works!
+    end
+  
+  end
+
   describe "it should exxclude to_* methods" do
 
     it "should raise NoMethodError when to_sim is called" do
@@ -62,7 +84,7 @@ module CloseEnoughSpec
   describe "warnings should be issued when the correct method is guessed" do
     it "should warn when guessing 'reverse' for 'reserve'" do
       str = "avocado"
-      str.should_receive(:warn).with("[CloseEnough] reserve not found, using reverse instead")
+      CloseEnough.should_receive(:warn).with("[CloseEnough] reserve not found, using reverse instead")
       str.reserve
     end
   end
